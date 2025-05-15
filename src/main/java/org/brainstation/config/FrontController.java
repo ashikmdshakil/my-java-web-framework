@@ -9,6 +9,12 @@ import java.io.PrintWriter;
 
 @WebServlet(urlPatterns = "/*")
 public class FrontController extends HttpServlet {
+    static {
+        System.out.println("*************************************");
+        System.out.println("THIS IS MY CUSTOM WEB FRAMEWORK");
+        System.out.println("*************************************");
+    }
+
     public void init() {
         System.out.println("Front Controller is initiated!");
     }
