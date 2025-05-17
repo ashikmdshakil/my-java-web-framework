@@ -6,6 +6,8 @@ import javax.servlet.annotation.HandlesTypes;
 import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @HandlesTypes(WebAppInitializer.class)
@@ -15,17 +17,19 @@ public class CustomServletContainerInitializer implements ServletContainerInitia
     public void onStartup(Set<Class<?>> set, ServletContext servletContext) {
         String classesDirPath = servletContext.getRealPath("WEB-INF/classes");
         Path path = Paths.get(classesDirPath);
-
+        List<Class<?>> classList = new ArrayList<>();
         for (Class<?> clazz : set) {
             if (isConcreteClass(clazz)) {
                 try {
                     WebAppInitializer initializer = createInitializerInstance(clazz);
-                    initializer.findAnnotatedClasses(path);
+                    classList = initializer.findAnnotatedClasses(path);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
+
+        classList.forEach(aClass -> System.out.println(aClass.getName() + " - " + aClass.isInterface()));
     }
 
     private boolean isConcreteClass(Class<?> clazz) {
