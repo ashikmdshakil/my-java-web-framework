@@ -2,29 +2,38 @@ package org.brainstation.config;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.HandlesTypes;
+import java.lang.reflect.Modifier;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Set;
 
 @HandlesTypes(WebAppInitializer.class)
 public class CustomServletContainerInitializer implements ServletContainerInitializer {
-    @Override
-    public void onStartup(Set<Class<?>> set, ServletContext servletContext) throws ServletException {
-        if (set != null) {
-            for (Class<?> clazz : set) {
-                try {
-                    // Make sure the class is assignable to WebAppInitializer
-                    if (WebAppInitializer.class.isAssignableFrom(clazz)) {
-                        WebAppInitializer initializer =
-                                (WebAppInitializer) clazz.getDeclaredConstructor().newInstance();
 
-                        // Call the method you defined in your interface
-                        initializer.findAnnotatedClasses("org");
-                    }
+    @Override
+    public void onStartup(Set<Class<?>> set, ServletContext servletContext) {
+        String classesDirPath = servletContext.getRealPath("WEB-INF/classes");
+        Path path = Paths.get(classesDirPath);
+
+        for (Class<?> clazz : set) {
+            if (isConcreteClass(clazz)) {
+                try {
+                    WebAppInitializer initializer = createInitializerInstance(clazz);
+                    initializer.findAnnotatedClasses(path);
                 } catch (Exception e) {
-                    throw new ServletException("Failed to instantiate WebAppInitializer: " + clazz, e);
+                    e.printStackTrace();
                 }
             }
         }
+    }
+
+    private boolean isConcreteClass(Class<?> clazz) {
+        int modifiers = clazz.getModifiers();
+        return !clazz.isInterface() && !Modifier.isAbstract(modifiers);
+    }
+
+    private WebAppInitializer createInitializerInstance(Class<?> clazz) throws ReflectiveOperationException {
+        return (WebAppInitializer) clazz.getDeclaredConstructor().newInstance();
     }
 }

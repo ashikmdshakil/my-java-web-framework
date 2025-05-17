@@ -3,17 +3,13 @@ package org.brainstation.config;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 public class WebAppInitializerImpl implements WebAppInitializer {
     @Override
-    public Class<?> findAnnotatedClasses(String rootPackage) throws IOException {
-        String rootDirectoryPath = rootPackage.replace('.', '/');
-
-        Path rootDirectory = Paths.get(rootDirectoryPath);
+    public Class<?> findAnnotatedClasses(Path rootDirectory) throws IOException {
         if (!Files.exists(rootDirectory)) {
             throw new RuntimeException("Root package is not right");
         }
@@ -26,7 +22,7 @@ public class WebAppInitializerImpl implements WebAppInitializer {
     }
 
     public void controllerClassNames(Path rootDirectory, List<String> classNames) throws IOException {
-        Stream<Path> elements = Files.list(rootDirectory);
+        Stream<Path> elements = Files.list(rootDirectory);  // Fetching files and directories in current directory
 
         elements.forEach(element -> {
             if (Files.isDirectory(element)) {
@@ -36,8 +32,8 @@ public class WebAppInitializerImpl implements WebAppInitializer {
                     throw new RuntimeException(e);
                 }
             } else if (Files.isRegularFile(element)) {
-                if (element.endsWith(".class")) {
-                    classNames.add(element.toString().replace('/', '.'));
+                if (element.toString().endsWith(".class")) {
+                    classNames.add(element.getFileName().toString());
                 }
             }
         });
