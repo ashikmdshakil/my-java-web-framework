@@ -17,7 +17,16 @@ public class CustomServletContainerInitializer implements ServletContainerInitia
     public void onStartup(Set<Class<?>> set, ServletContext servletContext) {
         String classesDirPath = servletContext.getRealPath("WEB-INF/classes");
         Path path = Paths.get(classesDirPath);
+
+        // Sort out all the classes
         List<Class<?>> classList = new ArrayList<>();
+        applicationClassList(set, path, classList);
+
+        // Store the classes in servlet context
+        servletContext.setAttribute("classFiles", classList);
+    }
+
+    private List<Class<?>> applicationClassList(Set<Class<?>> set, Path path, List<Class<?>> classList) {
         for (Class<?> clazz : set) {
             if (isConcreteClass(clazz)) {
                 try {
@@ -28,8 +37,7 @@ public class CustomServletContainerInitializer implements ServletContainerInitia
                 }
             }
         }
-
-        classList.forEach(aClass -> System.out.println(aClass.getName() + " - " + aClass.isInterface()));
+        return classList;
     }
 
     private boolean isConcreteClass(Class<?> clazz) {
