@@ -6,7 +6,6 @@ import javax.servlet.annotation.HandlesTypes;
 import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -19,14 +18,14 @@ public class CustomServletContainerInitializer implements ServletContainerInitia
         Path path = Paths.get(classesDirPath);
 
         // Sort out all the classes
-        List<Class<?>> classList = new ArrayList<>();
-        applicationClassList(set, path, classList);
+        List<Class<?>> classList = applicationClassList(set, path);
 
         // Store the classes in servlet context
         servletContext.setAttribute("classFiles", classList);
     }
 
-    private List<Class<?>> applicationClassList(Set<Class<?>> set, Path path, List<Class<?>> classList) {
+    private List<Class<?>> applicationClassList(Set<Class<?>> set, Path path) {
+        List<Class<?>> classList = null;
         for (Class<?> clazz : set) {
             if (isConcreteClass(clazz)) {
                 try {

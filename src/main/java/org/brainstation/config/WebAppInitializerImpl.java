@@ -15,19 +15,19 @@ public class WebAppInitializerImpl implements WebAppInitializer {
         }
 
         List<Class<?>> classList = new ArrayList<>();
-        findFullyQualifiedClassNames(rootDirectory, "", classList);
+        findByFullyQualifiedClassNames(rootDirectory, "", classList);
 
         return classList;
     }
 
-    public void findFullyQualifiedClassNames(Path rootDirectory, String prefix, List<Class<?>> classList) throws IOException {
+    public void findByFullyQualifiedClassNames(Path rootDirectory, String prefix, List<Class<?>> classList) throws IOException {
         Stream<Path> elements = Files.list(rootDirectory);  // Fetching files and directories in current directory
         elements.forEach(element -> {
             if ("META-INF".equals(element.getFileName().toString())) {
                 return;
             } else if (Files.isDirectory(element)) {
                 try {
-                    findFullyQualifiedClassNames(element, prefix.concat(element.getFileName().toString().concat(".")), classList);
+                    findByFullyQualifiedClassNames(element, prefix.concat(element.getFileName().toString().concat(".")), classList);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
