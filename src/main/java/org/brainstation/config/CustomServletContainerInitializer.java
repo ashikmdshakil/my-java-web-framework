@@ -19,7 +19,6 @@ public class CustomServletContainerInitializer implements ServletContainerInitia
 
         // Sort out all the classes
         List<Class<?>> classList = applicationClassList(set, path);
-
         // Store the classes in servlet context
         servletContext.setAttribute("classFiles", classList);
     }
